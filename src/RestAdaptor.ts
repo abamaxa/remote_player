@@ -12,7 +12,7 @@ export class HTTPRestAdaptor implements RestAdaptor {
   private readonly host?: string;
 
   constructor(host?: string) {
-    this.host = host;
+    this.host = host || window.location.host;
   }
 
   getHost = (): string | null => {
