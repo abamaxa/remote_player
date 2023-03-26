@@ -4,7 +4,6 @@ import {SocketAdaptor} from "./Socket";
 import {RemoteMessage} from "./Messages";
 import {HTTPRestAdaptor, RestAdaptor} from "./RestAdaptor";
 
-// const host: RestAdaptor = new HTTPRestAdaptor("coco.abamaxa.com");
 const host: RestAdaptor = new HTTPRestAdaptor();
 
 createLogger(host);
