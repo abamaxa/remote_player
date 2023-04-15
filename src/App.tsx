@@ -28,10 +28,16 @@ const App = () => {
     new SocketAdaptor(
       () => new WebSocket(`ws://${host.getHost()}/remote/ws`),
       (message: RemoteMessage) => {
-        log_info(`Got message: ${message}`);
         if (message.Play !== undefined) {
           log_info(`Got play message: ${message.Play.url}`);
-          const url = `http://${host.getHost()}${message.Play.url}`;
+
+          let url: string;
+          if (message.Play.url.startsWith("http")) {
+            // hacky fix for samsung tvs
+            url = message.Play.url.replace("\/stream\/", "/alt-stream/");
+          } else {
+            url = `http://${host.getHost()}${message.Play.url}`;
+          }
           setCurrentVideo(url);
 
         } else if (message.Seek !== undefined && videoControlRef !== null) {
@@ -41,6 +47,8 @@ const App = () => {
         } else if (message.TogglePause !== undefined && videoControlRef !== null) {
           const vc = videoControlRef.current as unknown as HTMLVideoElement;
           togglePause(vc);
+        } else {
+          log_warning(`Got unknown message: ${message}`);
         }
       }
     );
@@ -51,6 +59,13 @@ const App = () => {
     log_info("getNextVideo called");
   }
 
+  const logVideoError = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const error = (e.target as HTMLVideoElement).error;
+    if (error) {
+      log_info(`Video error: ${error.message}`);
+    }
+  }
+
   if (currentVideo !== "") {
     return (
       <div className="bg-black h-screen w-screen">
@@ -58,6 +73,7 @@ const App = () => {
           className="h-screen m-auto"
           onEnded={e => getNextVideo(e)}
           onClick={e => togglePause(e.currentTarget)}
+          onError={e => logVideoError(e)}
           style={{objectFit: "contain"}}
           id="video"
           autoPlay={true}

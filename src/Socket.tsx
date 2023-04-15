@@ -69,7 +69,6 @@ export class SocketAdaptor {
         const txt = await new Response(event.data).text();
         log_info(`onReceive: ${txt}`);
         let data = JSON.parse(txt);
-        log_info(`onReceive: ${data} -> ${this.onMessage}`);
         this.onMessage(data);
       }
     }
