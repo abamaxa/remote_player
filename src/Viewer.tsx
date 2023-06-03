@@ -21,8 +21,8 @@ const Viewer = (props: VideoControlProps) => {
       () => new WebSocket(`ws://${host}/api/remote/ws`),
       (message: RemoteMessage) => {
         if (message.Play !== undefined) {
+          message.Play.url = message.Play.url.replace("/stream/", "/alt-stream/");
           setCurrentVideo(message.Play);
-
         } else if (message.Seek !== undefined && videoControlRef !== null) {
           const vc = videoControlRef.current as unknown as HTMLVideoElement;
           vc.currentTime = vc.currentTime + message.Seek.interval;
