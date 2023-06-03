@@ -1,5 +1,3 @@
-import {log_error} from "./Logger";
-
 export interface RestAdaptor {
   get: <T>(path: string) => Promise<T>;
   delete: (path: string) => Promise<Response>;
