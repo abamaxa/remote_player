@@ -151,16 +151,17 @@ export class SocketAdaptor {
    * @param event - The event to parse.
    */
   _parseMessage = async (event: any)=> {
+    // Convert response to text.
+    const txt = await new Response(event.data).text();
+
     try {
-      // Convert response to text.
-      const txt = await new Response(event.data).text();
       // Parse JSON data.
       let data = JSON.parse(txt);
       // Execute callback with parsed data.
       this.onMessage!(data);
     } catch (error) {
       // Log and throw error.
-      log_error(`error ${error}, received unexpected message: ${event.data}`);
+      log_error(`error ${error}, received unexpected message: ${txt}`);
       //throw error;
     }
   }

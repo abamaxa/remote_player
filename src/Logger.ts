@@ -23,7 +23,7 @@ export class ServerLogger implements Logger {
   }
 
   log_messages = (level: string, messages: string[]) => {
-    this.host.post('log', {level: level, messages: messages})
+    this.host.post('api/log', {level: level, messages: messages})
       .catch((err) => {
         console.error(err)
       })
