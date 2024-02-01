@@ -7,6 +7,10 @@ export interface PlayRequest {
   url: string; // The URL to audio or video media.
   collection: string;
   video: string;
+  width: number; // The width of the video.
+  height: number; // The height of the video. 
+  aspectWidth: number; // The width of the video.
+  aspectHeight: number; // The height of the video.
 }
 
 /**

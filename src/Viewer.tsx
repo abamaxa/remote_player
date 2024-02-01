@@ -13,6 +13,7 @@ const Viewer = (props: VideoControlProps) => {
   const [socket, setSocket] = useState<SocketAdaptor | null>(null);
   const [currentVideo, setCurrentVideo] = useState<PlayRequest>();
   const videoControlRef = useRef(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // eslint-disable-next-line no-restricted-globals
@@ -66,12 +67,54 @@ const Viewer = (props: VideoControlProps) => {
     }
   }
 
+  useEffect(() => {
+    const resizeVideo = () => {
+      if (currentVideo && currentVideo.width && currentVideo.height && videoContainerRef.current) {
+        const videoAspectRatio = currentVideo.aspectWidth / currentVideo.aspectHeight;
+        const screenAspectRatio = window.innerWidth / window.innerHeight;
+    
+        if (screenAspectRatio > videoAspectRatio) {
+          // Screen is wider than the video (letterboxing)
+          videoContainerRef.current.style.width = `${(videoAspectRatio / screenAspectRatio) * 100}vw`;
+          videoContainerRef.current.style.height = '100vh';
+        } else {
+          // Screen is taller than the video (pillarboxing)
+          videoContainerRef.current.style.height = `${(screenAspectRatio / videoAspectRatio) * 100}vh`;
+          videoContainerRef.current.style.width = '100vw';
+        }
+      }
+    }
+
+    window.addEventListener('resize', resizeVideo);
+
+    resizeVideo();
+
+    return () => {
+      window.removeEventListener('resize', resizeVideo);
+    }
+  }, [currentVideo]);
+  
   if (currentVideo !== undefined) {
-    // onClick={e => onClick(e)}
     return (
-        <div className="bg-black h-screen w-screen">
+      <div className="bg-black h-screen w-screen flex justify-center items-center" style={{ padding: 0, margin: 0 }}>
+        <div 
+          ref={videoContainerRef} 
+          className="flex justify-center items-center"
+          style={{ position: 'relative', width: '100%', height: '100%', padding: 0, margin: 0 }}
+        >
           <video
-            className="m-auto w-full h-screen object-contain outline-0"
+            className="outline-0"
+            style={{ 
+              position: 'absolute', 
+              top: '50%', 
+              left: '50%', 
+              transform: 'translate(-50%, -50%)', 
+              maxWidth: '100%', 
+              maxHeight: '100%', 
+              objectFit: 'fill',
+              width: '100%', 
+              height: '100%' 
+            }}
             onEnded={e => getNextVideo(e)}
             onError={e => logVideoError(e)}
             onTimeUpdate={e => onTimeUpdate(e)}
@@ -85,11 +128,12 @@ const Viewer = (props: VideoControlProps) => {
           >
           </video>
         </div>
+      </div>
     )
   } else {
     return (
-      <div className="bg-black h-screen w-screen flex">
-        <div className="p-1 mx-auto overflow-y-auto text-2xl text-white">
+      <div className="bg-black h-screen w-screen flex justify-center items-center">
+        <div className="bg-black p-1 mx-auto overflow-y-auto text-2xl text-white">
           <h1>Coming Soon...</h1>
         </div>
       </div>
@@ -98,3 +142,80 @@ const Viewer = (props: VideoControlProps) => {
 };
 
 export default Viewer;
+
+/*
+  useEffect(() => {
+    const resizeVideo = () => {
+      if (currentVideo && currentVideo.width && currentVideo.height && videoContainerRef.current) {
+        const videoAspectRatio = currentVideo.width / currentVideo.height;
+        const screenAspectRatio = window.innerWidth / window.innerHeight;
+    
+        if (screenAspectRatio > videoAspectRatio) {
+          // Screen is wider than the video (letterboxing)
+          videoContainerRef.current.style.width = '100vw' // `${(videoAspectRatio / screenAspectRatio) * 125}vw`;
+          videoContainerRef.current.style.height = '100vh';
+        } else {
+          // Screen is taller than the video (pillarboxing)
+          videoContainerRef.current.style.height = '100vh'; //`${(screenAspectRatio / videoAspectRatio) * 100}vh`;
+          videoContainerRef.current.style.width = '100vw';
+        }
+      }
+    }
+
+    window.addEventListener('resize', resizeVideo);
+
+    resizeVideo();
+
+    return () => {
+      window.removeEventListener('resize', resizeVideo);
+    }
+  }, [currentVideo]);
+  
+  if (currentVideo !== undefined) {
+    return (
+      <div className="bg-black h-screen w-screen flex justify-center items-center" style={{ padding: 0, margin: 0 }}>
+      <div 
+        ref={videoContainerRef} 
+        className="flex justify-center items-center"
+        style={{ position: 'relative', width: '100%', height: '100%', padding: 0, margin: 0 }}
+      >
+        <video
+          className="outline-0"
+          style={{ 
+            position: 'absolute', 
+            top: '50%', 
+            left: '50%', 
+            transform: 'translate(-50%, -50%)', 
+            maxWidth: '100%', 
+            maxHeight: '100%', 
+            objectFit: 'contain',
+            width: '100%', 
+            height: '100%' 
+          }}
+            onEnded={e => getNextVideo(e)}
+            onError={e => logVideoError(e)}
+            onTimeUpdate={e => onTimeUpdate(e)}
+            id="video"
+            autoPlay={true}
+            controls
+            muted={false}
+            playsInline={false}
+            src={currentVideo.url}
+            ref={videoControlRef}
+          >
+          </video>
+        </div>
+      </div>
+    )
+  } else {
+    return (
+      <div className="bg-black h-screen w-screen flex justify-center items-center">
+        <div className="bg-black p-1 mx-auto overflow-y-auto text-2xl text-white">
+          <h1>Coming Soon...</h1>
+        </div>
+      </div>
+    )
+  }
+
+
+*/
