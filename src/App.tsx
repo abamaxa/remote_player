@@ -3,7 +3,7 @@ import {createLogger} from "./Logger";
 import {HTTPRestAdaptor, RestAdaptor} from "./RestAdaptor";
 import Viewer from "./Viewer";
 
-const host: RestAdaptor = new HTTPRestAdaptor("localhost");
+const host: RestAdaptor = new HTTPRestAdaptor();
 
 createLogger(host);
 
